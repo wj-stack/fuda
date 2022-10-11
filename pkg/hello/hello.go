@@ -3,7 +3,7 @@ package hello
 import "fmt"
 
 const Name = "FudaTools"
-const Version = "V1.0"
+const Version = "v0.0.1"
 const Desc = "for fuda"
 
 func Hello() {
