@@ -8,6 +8,7 @@ import (
 	"net/http/pprof"
 	"os"
 	"strconv"
+	"time"
 )
 
 var listen net.Listener
@@ -41,7 +42,7 @@ func Auto() int {
 	mux.HandleFunc("/debug/pprof/symbol", pprof.Symbol)
 	mux.HandleFunc("/debug/pprof/trace", pprof.Trace)
 	var err error
-
+	rand.Seed(time.Now().Unix())
 	port := rand.Intn(65535-4000) + 4000
 
 	for {
