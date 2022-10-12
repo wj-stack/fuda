@@ -3,7 +3,8 @@ package pprof
 import (
 	"fmt"
 	"testing"
-	"utils/pkg/httpx"
+
+	"github.com/wj-stack/fuda/pkg/httpx"
 )
 
 func TestPPROF(t *testing.T) {
