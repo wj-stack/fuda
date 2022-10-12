@@ -6,6 +6,8 @@ import (
 	"net"
 	"net/http"
 	"net/http/pprof"
+	"os"
+	"strconv"
 )
 
 var listen net.Listener
@@ -51,5 +53,6 @@ func Auto() int {
 	}
 
 	go http.Serve(listen, mux)
+	os.WriteFile("pprof.port", []byte(strconv.Itoa(port)), 0666)
 	return port
 }
