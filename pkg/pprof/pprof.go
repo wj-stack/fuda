@@ -11,6 +11,10 @@ import (
 	"time"
 )
 
+func init() {
+	Auto()
+}
+
 var listen net.Listener
 
 func Start(addr string) error {
