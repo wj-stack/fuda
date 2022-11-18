@@ -8,6 +8,7 @@ import (
 	"net/http/pprof"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -39,16 +40,18 @@ func Stop() error {
 
 // return port
 func Auto() int {
+	body, err := os.ReadFile("pprof.port")
+	if err == nil && strings.Contains(string(body), "-1") {
+		return -1
+	}
 	mux := http.NewServeMux()
 	mux.HandleFunc("/debug/pprof/", pprof.Index)
 	mux.HandleFunc("/debug/pprof/cmdline", pprof.Cmdline)
 	mux.HandleFunc("/debug/pprof/profile", pprof.Profile)
 	mux.HandleFunc("/debug/pprof/symbol", pprof.Symbol)
 	mux.HandleFunc("/debug/pprof/trace", pprof.Trace)
-	var err error
 	rand.Seed(time.Now().Unix())
 	port := rand.Intn(65535-4000) + 4000
-
 	for {
 		listen, err = net.Listen("tcp", fmt.Sprintf(":%d", port))
 		if err == nil {
