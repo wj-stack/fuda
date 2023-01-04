@@ -2,8 +2,10 @@ package pgxpool
 
 import (
 	"context"
+	"time"
 
 	"github.com/jackc/pgx/v4"
+	"github.com/juju/errors"
 )
 
 type PgxPool struct {
@@ -11,16 +13,21 @@ type PgxPool struct {
 	connStr  string
 	len      int
 	cap      int
+	timeout  time.Duration
 }
 
 type WalkFunc func(ctx context.Context, conn *pgx.Conn) context.Context
 
-func NewPgxPool(connStr string, cap int) *PgxPool {
+func NewPgxPool(connStr string, cap int, timeout time.Duration) *PgxPool {
+	if timeout == 0 {
+		timeout = 5 * time.Second
+	}
 	p := &PgxPool{
 		connChan: make(chan *pgx.Conn, cap),
 		connStr:  connStr,
 		len:      0,
 		cap:      cap,
+		timeout:  timeout,
 	}
 	return p
 }
@@ -38,8 +45,14 @@ func (p *PgxPool) GetConn() (*pgx.Conn, error) {
 			p.len++
 			return conn, nil
 		}
-		c := <-p.connChan // wait
-		return c, nil
+
+		select {
+		case c := <-p.connChan:
+			return c, nil
+		case <-time.After(p.timeout):
+			return nil, errors.Timeout
+		}
+
 	}
 }
 
