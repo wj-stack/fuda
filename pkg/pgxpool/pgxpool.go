@@ -49,7 +49,7 @@ func (p *PgxPool) GetConn() (*pgx.Conn, error) {
 		select {
 		case c := <-p.connChan:
 			return c, nil
-		case <-time.After(p.timeout):
+		case <-time.After(p.timeout * time.Second):
 			return nil, errors.Timeout
 		}
 
